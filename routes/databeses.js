@@ -26,21 +26,12 @@ router.post('/:id', async(req,res) =>{
         item = await db.collection('databases').findOne({_id: `${parent}_${id}`});
     }
     if(item && item.command && userValue){
-        item.command = item.command.replace('user_value',userValue)
+        item.command = item.command.replace('user_value',userValue).replace('user_value',userValue)
     }
     res.send(item)
 });
 
-router.patch('/download', async(req,res)=>{
-    const commands= req.body.commands.join("\n");
-    fs.writeFile('Dockerfile', commands, (err) => { 
-      
-        // In case of a error throw err. 
-        if (err) throw err; 
-    }) 
-    res.download('./Dockerfile', 'Dockerfile')
-    res.end()
-});
+
 
 module.exports = router;
 
