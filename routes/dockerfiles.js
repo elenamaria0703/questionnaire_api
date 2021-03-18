@@ -13,21 +13,29 @@ router.post('/upload', async(req,res)=>{
     }
     fs.writeFile(`./static/${userId}/Dockerfile`, commands, (err) => { 
         if (err) throw err; 
-    }) 
-    fs.readFile(`./static/${userId}/Dockerfile`, 'utf8',(err, data) => {
-        if (err) throw err;
-        console.log(data);
-      });
+    })  
     res.send(true);
-    console.log("yes");
 });
 
-// router.post('/download', async(req,res)=>{
-//     await res.download('./tmp/Dockerfile', 'Dockerfile')
-//     setTimeout(function () {
-//         fs.truncate('./tmp/Dockerfile', 0, function(){console.log('done')})
-//     }, 5000);
+router.post('/get-user-file', async(req,res)=>{
+    const userId = req.body.userId;
+    fs.readFile(`./static/${userId}/Dockerfile`, 'utf8',(err, data) => {
+        if (err) {
+            res.sendStatus(404);
+        };
+        console.log(data);
+        res.send(data);
+    });
     
-// });
+})
+
+router.post('/empty-user-file', async(req,res)=>{
+    const userId = req.body.userId;
+    
+    setTimeout(()=>fs.truncate(`./static/${userId}/Dockerfile`, 0, function(){
+        console.log("empty file");
+        res.sendStatus(200);
+    }), 5000);
+});
 
 module.exports=router;
