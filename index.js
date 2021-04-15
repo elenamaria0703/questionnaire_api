@@ -10,8 +10,8 @@ app.use(express.static('static'))
 const databasesRoute = require('./routes/databeses');
 app.use('/databases', databasesRoute);
 
-const othersRoute = require('./routes/others');
-app.use('/others', othersRoute);
+const othersRoute = require('./routes/apis');
+app.use('/apis', othersRoute);
 
 const dockerfilesRoute = require('./routes/dockerfiles');
 app.use('/dockerfiles', dockerfilesRoute);

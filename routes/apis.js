@@ -23,9 +23,9 @@ router.post('/:id', async(req,res) =>{
     const userInputs = req.body.userInputs
     console.log(userInputs);
     const db = client.db('licenta');
-    let item = await db.collection('others').findOne({_id: id});
+    let item = await db.collection('apis').findOne({_id: id});
     if(item == null && parent !== ''){
-        item = await db.collection('others').findOne({_id: `${parent}_${id}`});
+        item = await db.collection('apis').findOne({_id: `${parent}_${id}`});
     }
     if(item && item.command && userValue){
         item.command = item.command.replace('user_value',userValue).replace('user_value',userValue)
