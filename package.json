@@ -10,13 +10,18 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "child_process": "^1.0.2",
     "cors": "^2.8.5",
+    "dockerode": "^3.3.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "extract-zip": "^2.0.1",
     "fs": "0.0.1-security",
     "google-auth-library": "^7.0.2",
+    "js-yaml": "^4.1.0",
     "mongodb": "^3.6.4",
     "mongoose": "^5.11.15",
+    "multiparty": "^4.2.2",
     "nodemon": "^2.0.7"
   }
 }

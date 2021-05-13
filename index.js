@@ -10,10 +10,19 @@ app.use(express.static('static'))
 const databasesRoute = require('./routes/databeses');
 app.use('/databases', databasesRoute);
 
-const othersRoute = require('./routes/apis');
-app.use('/apis', othersRoute);
+const apisRoute = require('./routes/apis');
+app.use('/apis', apisRoute);
+
+const webRoute = require('./routes/web');
+app.use('/web', webRoute);
 
 const dockerfilesRoute = require('./routes/dockerfiles');
 app.use('/dockerfiles', dockerfilesRoute);
+
+const dockerRoute = require('./routes/docker');
+app.use('/docker', dockerRoute);
+
+const projectsRoute = require('./routes/projects');
+app.use('/projects', projectsRoute);
 
 app.listen(3000);

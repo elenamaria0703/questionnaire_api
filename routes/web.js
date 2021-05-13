@@ -23,16 +23,16 @@ router.post('/:id', async(req,res) =>{
     const userInputs = req.body.userInputs
     console.log(userInputs);
     const db = client.db('licenta');
-    let item = await db.collection('apis').findOne({_id: id});
+    let item = await db.collection('web').findOne({_id: id});
     if(item == null && parent !== ''){
-        item = await db.collection('apis').findOne({_id: `${parent}_${id}`});
+        item = await db.collection('web').findOne({_id: `${parent}_${id}`});
     }
     if(item && item.command && userValue){
-        item.command = item.command.replace(/user_value/g,userValue)
+        item.command = item.command.replace('user_value',userValue).replace('user_value',userValue)
     }
     userInputs && userInputs.forEach(element => {
         if(item && item.command)
-            item.command = item.command.replaceAll(element.key,element.value)
+            item.command = item.command.replace(element.key,element.value).replace(element.key,element.value).replace(element.key,element.value)
     });
     res.send(item)
 });

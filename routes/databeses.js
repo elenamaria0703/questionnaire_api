@@ -26,7 +26,10 @@ router.post('/:id', async(req,res) =>{
         item = await db.collection('databases').findOne({_id: `${parent}_${id}`});
     }
     if(item && item.command && userValue){
-        item.command = item.command.replace('user_value',userValue).replace('user_value',userValue)
+        item.command = item.command.replace(/user_value/g,userValue)
+    }
+    if(item && item.dc_command && userValue){
+        item.dc_command[1] = item.dc_command[1].replace('user_value',userValue)
     }
     res.send(item)
 });
