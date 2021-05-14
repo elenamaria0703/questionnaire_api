@@ -11,25 +11,33 @@ router.post('/:id/image', async(req,res)=>{
     var image = req.body.image;
     var project = req.body.name;
     var source = req.body.source;
-    let stream = await docker.buildImage({
+    await docker.buildImage({
         context: `static/${user}/projects/${project}`,
         src: [ 'Dockerfile',source]
-    }, {t: `myonboard/${image}`}, function (err, response) { 
-    });   
-    setTimeout(function(){
-        console.log("started push")
-        exec(`docker push myonboard/${image}`, (error, stdout, stderr) => {
-            if (error) {
-                console.log(`error: ${error.message}`);
-                return;
+    }, {t: `myonboard/${image}`}, function (err, stream) { 
+        docker.modem.followProgress(stream, onFinished, onProgress)
+            function onFinished(err, output) {
+                if (err) {
+                    throw err;
+                }
+                console.log("started push");
+                exec(`docker push myonboard/${image}`, (error, stdout, stderr) => {
+                    if (error) {
+                        console.log(`error: ${error.message}`);
+                        return;
+                    }
+                    if (stderr) {
+                        console.log(`stderr: ${stderr}`);
+                        return;
+                    }
+                    console.log(`stdout: ${stdout}`);
+                });
+
             }
-            if (stderr) {
-                console.log(`stderr: ${stderr}`);
-                return;
+            function onProgress(event) {
+                console.log("building")
             }
-            console.log(`stdout: ${stdout}`);
-        });
-    }, 30000);
+    });  
 })
 
 module.exports=router;
