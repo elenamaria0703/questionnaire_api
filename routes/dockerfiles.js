@@ -31,6 +31,20 @@ router.post('/:name/upload-build-ss', async(req,res)=>{
 });
 
 
+router.post('/:project/:service/upload-build-ms', async(req,res)=>{
+    const commands = req.body.commands.join("\n");
+    const userId = req.body.userId;
+    const proj = req.params.project;
+    const serv = req.params.service;
+    var dir = `./static/${userId}/projects/${proj}/${serv}`;
+
+    fs.writeFile(`${dir}/Dockerfile`, commands, (err) => { 
+        if (err) throw err; 
+    })  
+    res.send(true);
+});
+
+
 router.post('/upload-services', async(req,res)=>{
     const commands = req.body.commands
     const userId = req.body.userId;
@@ -81,6 +95,37 @@ router.post('/empty-user-file', async(req,res)=>{
         console.log("empty file");
         res.sendStatus(200);
     }), 5000);
+});
+
+router.post('/upload-build-services', async(req,res)=>{
+    const commands = req.body.commands
+    const userId = req.body.userId;
+    const project = req.body.projectName;
+    var dir = `./static/${userId}/projects/${project}`;
+    
+    let data={};
+    commands.forEach((service)=>{
+        const name = service.name;
+        let params = {};
+        for(i=0;i<service.commands_array.length;i++){
+            const element = service.commands_array[i];
+            if(element.name == "image")
+                Object.assign(params, {image: element.value[0]});
+            else
+                Object.assign(params, {[element.name]: element.value});
+        }
+        Object.assign(data, {[name]: params});
+    })
+    
+    let data_to_send={
+        version: '3',
+        services: data
+    }
+
+    let yamlStr = yaml.dump(data_to_send);
+    fs.writeFileSync(`${dir}/docker-compose.yml`, yamlStr, 'utf8');  
+    
+    res.send(true);
 });
 
 module.exports=router;
