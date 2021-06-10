@@ -21,6 +21,8 @@ async function connectDatabase(){
 connectDatabase();
 
 function createUserDirectory(user,name){
+  console.log("user", user);
+  console.log("name", name);
   var dir = `./static/${user}`;
   if (!fs.existsSync(dir))
     fs.mkdirSync(dir);

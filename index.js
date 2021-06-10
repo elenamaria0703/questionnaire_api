@@ -2,10 +2,17 @@ const express= require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+var pathfinderUI = require('pathfinder-ui');
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('static'))
+
+app.use('/pathfinder', function(req, res, next){
+    pathfinderUI(app);
+    next();
+  }, pathfinderUI.router);
+  
 
 const databasesRoute = require('./routes/databeses');
 app.use('/databases', databasesRoute);

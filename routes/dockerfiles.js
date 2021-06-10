@@ -109,8 +109,8 @@ router.post('/upload-build-services', async(req,res)=>{
         let params = {};
         for(i=0;i<service.commands_array.length;i++){
             const element = service.commands_array[i];
-            if(element.name == "image")
-                Object.assign(params, {image: element.value[0]});
+            if(element.name == "image" || element.name == "restart")
+                Object.assign(params, {[element.name]: element.value[0]});
             else
                 Object.assign(params, {[element.name]: element.value});
         }
