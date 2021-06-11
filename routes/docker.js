@@ -4,6 +4,21 @@ const fs = require('fs')
 const { exec } = require("child_process");
 var Docker = require('dockerode');
 var docker = new Docker();
+const MongoClient = require('mongodb').MongoClient;
+
+require('dotenv/config');
+
+const uri = process.env.DB_CONNECT_STRING;
+let client;
+let db;
+async function connectDatabase(){
+    client = await MongoClient.connect(uri, { 
+        useNewUrlParser: true, 
+        useUnifiedTopology: true,
+    });
+    db = client.db('licenta');
+}
+connectDatabase();
 
 
 router.post('/:id/image', async(req,res)=>{
@@ -73,7 +88,14 @@ router.post('/:id/service-image', async(req,res)=>{
             function onProgress(event) {
                 console.log("building")
             }
-    });  
+    }); 
+    db.collection("projects").findOneAndUpdate(
+        {"user": user, "project_name": project, "services.service_name": service},
+        { "$set": { "services.$.status" : "BUILT" }},
+        function(err,doc) {
+          console.log("status updates")
+        }
+     ); 
 })
 
 module.exports=router;
