@@ -141,4 +141,20 @@ router.post('/:id/:project/:service/upload-multiple-service-source', async(req,r
     }
   });
 })
+
+router.post('/:id/:project/new-service', async(req,res)=>{
+  const user = req.params.id;
+  const project_name = req.params.project;
+  const service = req.body.service;
+  const service_name = service.service_name;
+  console.log(service);
+  createServiceDirectory(user,project_name,service_name)
+  db.collection("projects").findOneAndUpdate(
+    {"user": user, "project_name": project_name},
+    { "$push": { "services" : service }},
+    function(err,doc) {
+      console.log("add service")
+    }
+  ); 
+})
 module.exports=router;
