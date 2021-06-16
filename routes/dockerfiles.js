@@ -111,7 +111,16 @@ router.post('/upload-build-services', async(req,res)=>{
             const element = service.commands_array[i];
             if(element.name == "image" || element.name == "restart")
                 Object.assign(params, {[element.name]: element.value[0]});
-            else
+            else if(element.name == "environment"){
+                let env = {};
+                element.value.forEach(v=>{
+                    const key = v.split(':')[0];
+                    const value = v.split(':')[1];
+                    Object.assign(env, {[key]: value});
+                })
+                Object.assign(params, {[element.name]: env});
+            }
+            else 
                 Object.assign(params, {[element.name]: element.value});
         }
         Object.assign(data, {[name]: params});
