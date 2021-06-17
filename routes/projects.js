@@ -53,9 +53,9 @@ router.post('/:id/create', async(req,res)=>{
   var dir = `./static/${user}/projects/${name}`;
   var project;
   if(type == "MULTIPLE_SERVICE")
-    project = { user: user, project_name: name, services: [service] ,type};
+    project = { user: user, project_name: name, services: [service] ,type, status: "NOT_BUILT"};
   else
-    project = { user: user, project_name: name, type}
+    project = { user: user, project_name: name, type, status: "NOT_BUILT"}
 
   db.collection("projects").insertOne(project, function(err, res) {
     if (err) throw err;
@@ -99,6 +99,13 @@ router.post('/:id/:name/upload-single-service-source', async(req,res)=>{
         }else{
           fs.writeFileSync(`./static/${user}/projects/${project_name}/${name}`,buffer)
         }
+        db.collection("projects").findOneAndUpdate(
+          {"user": user, "project_name": project_name},
+          { "$set": { "$.uploadedSource" : name }},
+          function(err,doc) {
+            console.log("set project source")
+          }
+        ); 
         return res.status(200).send(name);
       } catch (err) {
         console.log(err.message)
@@ -134,6 +141,13 @@ router.post('/:id/:project/:service/upload-multiple-service-source', async(req,r
       }else{
         fs.writeFileSync(`./static/${user}/projects/${project_name}/${service_name}/${name}`,buffer)
       }
+      db.collection("projects").findOneAndUpdate(
+        {"user": user, "project_name": project_name, "services.service_name": service_name},
+        { "$set": { "services.$.source" : name }},
+        function(err,doc) {
+          console.log("set service source")
+        }
+      ); 
       return res.status(200).send(name);
     } catch (err) {
       console.log(err.message)
@@ -156,5 +170,20 @@ router.post('/:id/:project/new-service', async(req,res)=>{
       console.log("add service")
     }
   ); 
+})
+
+router.post('/:id/:project/service-status', async(req,res)=>{
+  const id = req.params.id;
+  const project = req.params.project;
+  const service = req.body.service;
+  const status = req.body.status;
+
+  db.collection("projects").findOneAndUpdate(
+    {"user": id, "project_name": project, "services.service_name": service},
+    { "$set": { "services.$.status" : status }},
+    function(err,doc) {
+      console.log("status update")
+    }
+  );  
 })
 module.exports=router;
