@@ -22,7 +22,8 @@
     "mongodb": "^3.6.4",
     "mongoose": "^5.11.15",
     "multiparty": "^4.2.2",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "ws": "^7.5.0"
   },
   "devDependencies": {
     "pathfinder-ui": "^1.0.3"
