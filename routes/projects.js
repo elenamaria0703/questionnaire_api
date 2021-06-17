@@ -101,7 +101,7 @@ router.post('/:id/:name/upload-single-service-source', async(req,res)=>{
         }
         db.collection("projects").findOneAndUpdate(
           {"user": user, "project_name": project_name},
-          { "$set": { "$.uploadedSource" : name }},
+          { "$set": { "uploadedSource" : name }},
           function(err,doc) {
             console.log("set project source")
           }
@@ -186,4 +186,35 @@ router.post('/:id/:project/service-status', async(req,res)=>{
     }
   );  
 })
+
+router.post('/:id/:name/upload-single-service-source-link', async(req,res)=>{
+  const id = req.params.id;
+  const project = req.params.name;
+  const link = req.body.link;
+
+  const path = `static/${id}/projects/${project}`
+  db.collection("projects").findOneAndUpdate(
+    {"user": id, "project_name": project},
+    { "$set": { "uploadedSource" : link }},
+    function(err,doc) {
+      console.log("set project source")
+    }
+  ); 
+  exec(`cd ${path} && git clone ${link}`, (error, stdout, stderr) => {
+    if (error) {
+        console.log(`error: ${error.message}`);
+    }
+    if (stderr) {
+        console.log(`stderr: ${stderr}`);
+    }
+    console.log("executed")
+    console.log(`stdout: ${stdout}`);
+  });
+  res.send(link).status(200);
+})
+
+router.post('/:id/:project/:service/upload-multiple-service-source-link', async(req,res)=>{
+
+})
+
 module.exports=router;

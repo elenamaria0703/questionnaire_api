@@ -99,17 +99,3 @@ router.post('/:id/service-image', async(req,res)=>{
 })
 
 module.exports=router;
-
-    // var link = "https://github.com/ThomasG77/angular-openlayers-minimal-project.git"
-    // exec(`cd test && git clone ${link}`, (error, stdout, stderr) => {
-    //     if (error) {
-    //         console.log(`error: ${error.message}`);
-    //         return;
-    //     }
-    //     if (stderr) {
-    //         console.log(`stderr: ${stderr}`);
-    //         return;
-    //     }
-    //     console.log("executed")
-    //     console.log(`stdout: ${stdout}`);
-    // });
