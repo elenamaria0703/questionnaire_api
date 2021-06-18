@@ -97,6 +97,6 @@ app.use('/projects', projectsRoute);
 const repositoryRoute = require('./routes/repository');
 app.use('/repository', repositoryRoute);
 
-server.listen(process.env.PORT || 3000, () => {
+server.listen(process.env.PORT || 4000, () => {
     console.log(`Server started on port ${server.address().port} :)`);
 });

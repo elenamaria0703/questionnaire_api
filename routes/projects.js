@@ -137,13 +137,12 @@ router.post('/:id/:project/:service/upload-multiple-service-source', async(req,r
           }catch (err) {
             console.log(err);
           }
-
       }else{
         fs.writeFileSync(`./static/${user}/projects/${project_name}/${service_name}/${name}`,buffer)
       }
       db.collection("projects").findOneAndUpdate(
         {"user": user, "name": project_name, "services.service_name": service_name},
-        { "$set": { "services.$.source" : name }},
+        { "$set": { "services.$.source" : name.split(".")[0]}},
         function(err,doc) {
           console.log("set service source")
         }
