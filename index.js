@@ -43,7 +43,6 @@ app.use(express.static('static'))
   
 //   wss.clients
 //       .forEach(client => {
-
 //         client.send([id,project]);   
 //       });
 // })

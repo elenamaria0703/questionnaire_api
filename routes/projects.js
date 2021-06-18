@@ -182,7 +182,21 @@ router.post('/:id/:project/service-status', async(req,res)=>{
     {"user": id, "project_name": project, "services.service_name": service},
     { "$set": { "services.$.status" : status }},
     function(err,doc) {
-      console.log("status update")
+      console.log("service status update")
+    }
+  );  
+})
+
+router.post('/:id/:project/project-status', async(req,res)=>{
+  const id = req.params.id;
+  const project = req.params.project;
+  const status = req.body.status;
+
+  db.collection("projects").findOneAndUpdate(
+    {"user": id, "project_name": project},
+    { "$set": { "status" : status }},
+    function(err,doc) {
+      console.log("project status update")
     }
   );  
 })
