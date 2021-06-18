@@ -53,9 +53,9 @@ router.post('/:id/create', async(req,res)=>{
   var dir = `./static/${user}/projects/${name}`;
   var project;
   if(type == "MULTIPLE_SERVICE")
-    project = { user: user, project_name: name, services: [service] ,type, status: "NOT_BUILT"};
+    project = { user: user, name: name, services: [service] ,type, status: "NOT_BUILT"};
   else
-    project = { user: user, project_name: name, type, status: "NOT_BUILT"}
+    project = { user: user, name: name, type, status: "NOT_BUILT"}
 
   db.collection("projects").insertOne(project, function(err, res) {
     if (err) throw err;
@@ -100,8 +100,8 @@ router.post('/:id/:name/upload-single-service-source', async(req,res)=>{
           fs.writeFileSync(`./static/${user}/projects/${project_name}/${name}`,buffer)
         }
         db.collection("projects").findOneAndUpdate(
-          {"user": user, "project_name": project_name},
-          { "$set": { "uploadedSource" : name }},
+          {"user": user, "name": project_name},
+          { "$set": { "uploadedSource" : name.split(".")[0] }},
           function(err,doc) {
             console.log("set project source")
           }
@@ -142,7 +142,7 @@ router.post('/:id/:project/:service/upload-multiple-service-source', async(req,r
         fs.writeFileSync(`./static/${user}/projects/${project_name}/${service_name}/${name}`,buffer)
       }
       db.collection("projects").findOneAndUpdate(
-        {"user": user, "project_name": project_name, "services.service_name": service_name},
+        {"user": user, "name": project_name, "services.service_name": service_name},
         { "$set": { "services.$.source" : name }},
         function(err,doc) {
           console.log("set service source")
@@ -164,7 +164,7 @@ router.post('/:id/:project/new-service', async(req,res)=>{
   console.log(service);
   createServiceDirectory(user,project_name,service_name)
   db.collection("projects").findOneAndUpdate(
-    {"user": user, "project_name": project_name},
+    {"user": user, "name": project_name},
     { "$push": { "services" : service }},
     function(err,doc) {
       console.log("add service")
@@ -179,7 +179,7 @@ router.post('/:id/:project/service-status', async(req,res)=>{
   const status = req.body.status;
 
   db.collection("projects").findOneAndUpdate(
-    {"user": id, "project_name": project, "services.service_name": service},
+    {"user": id, "name": project, "services.service_name": service},
     { "$set": { "services.$.status" : status }},
     function(err,doc) {
       console.log("service status update")
@@ -193,7 +193,7 @@ router.post('/:id/:project/project-status', async(req,res)=>{
   const status = req.body.status;
 
   db.collection("projects").findOneAndUpdate(
-    {"user": id, "project_name": project},
+    {"user": id, "name": project},
     { "$set": { "status" : status }},
     function(err,doc) {
       console.log("project status update")
@@ -208,7 +208,7 @@ router.post('/:id/:name/upload-single-service-source-link', async(req,res)=>{
 
   const path = `static/${id}/projects/${project}`
   db.collection("projects").findOneAndUpdate(
-    {"user": id, "project_name": project},
+    {"user": id, "name": project},
     { "$set": { "uploadedSource" : link }},
     function(err,doc) {
       console.log("set project source")
@@ -235,7 +235,7 @@ router.post('/:id/:project/:service/upload-multiple-service-source-link', async(
 
   const path = `static/${id}/projects/${project}/${service}`
   db.collection("projects").findOneAndUpdate(
-    {"user": id, "project_name": project, "services.service_name": service},
+    {"user": id, "name": project, "services.service_name": service},
     { "$set": { "services.$.source" : link }},
     function(err,doc) {
       console.log("set service source")

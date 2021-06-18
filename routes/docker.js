@@ -90,7 +90,7 @@ router.post('/:id/service-image', async(req,res)=>{
             }
     }); 
     db.collection("projects").findOneAndUpdate(
-        {"user": user, "project_name": project, "services.service_name": service},
+        {"user": user, "name": project, "services.service_name": service},
         { "$set": { "services.$.status" : "BUILT" }},
         function(err,doc) {
           console.log("status updates")

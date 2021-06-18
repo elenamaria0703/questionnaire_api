@@ -5,7 +5,23 @@ const cors = require('cors');
 var pathfinderUI = require('pathfinder-ui');
 const http = require('http');
 const WebSocket = require('ws');
+const router = express.Router();
+const { exec } = require("child_process");
+const MongoClient = require('mongodb').MongoClient;
 
+require('dotenv/config');
+
+const uri = process.env.DB_CONNECT_STRING;
+let client;
+let db;
+async function connectDatabase(){
+    client = await MongoClient.connect(uri, { 
+        useNewUrlParser: true, 
+        useUnifiedTopology: true,
+    });
+    db = client.db('licenta');
+}
+connectDatabase();
 
 const server = http.createServer(app);
 
@@ -20,34 +36,40 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('static'))
 
-// app.post('/:id/:project/payload', async(req,res)=>{
-//   const id = req.params.id;
-//   const project = req.params.project;
+router.post('/:id/:project/:service/payload', async(req,res)=>{
+  const id = req.params.id;
+  const project = req.params.project;
+  const service = req.params.service;
   
-//   const path = `static/${id}/projects/${project}`;
-//   const link = req.body.repository.clone_url;
-//   const name = req.body.repository.name;
-//   console.log(link);
-//   console.log(name);
+  const path = `static/${id}/projects/${project}/${service}`;
+  const link = req.body.repository.clone_url;
+  const name = req.body.repository.name;
+  console.log(link);
+  console.log(name);
 
-//   exec(`cd ${path} && rm -r ${name} && git clone ${link}`, (error, stdout, stderr) => {
-//     if (error) {
-//         console.log(`error: ${error.message}`);
-//     }
-//     if (stderr) {
-//         console.log(`stderr: ${stderr}`);
-//     }
-//     console.log("executed")
-//     console.log(`stdout: ${stdout}`);
-//   });
+  let service_db = await db.collection("projects").findOne({"user": id, "name": project, "services.service_name": service});
   
-//   wss.clients
-//       .forEach(client => {
-//         client.send([id,project]);   
-//       });
-// })
+  let image = service_db.services.find(serv=> serv.service_name == service).image_name
+  console.log(image);
+  wss.clients
+    .forEach(client => {
+      client.send(`${id}:${project}:${service}:${image}:${name}`);   
+    });
 
+  exec(`cd ${path} && rm -r ${name} && git clone ${link}`, (error, stdout, stderr) => {
+    if (error) {
+        console.log(`error: ${error.message}`);
+    }
+    if (stderr) {
+        console.log(`stderr: ${stderr}`);
+    }
+    console.log("executed")
+    console.log(`stdout: ${stdout}`);
+  });
+  //the client will request new service built
+})
 
+app.use('/',router);
 app.use('/pathfinder', function(req, res, next){
     pathfinderUI(app);
     next();
@@ -71,6 +93,9 @@ app.use('/docker', dockerRoute);
 
 const projectsRoute = require('./routes/projects');
 app.use('/projects', projectsRoute);
+
+const repositoryRoute = require('./routes/repository');
+app.use('/repository', repositoryRoute);
 
 server.listen(process.env.PORT || 3000, () => {
     console.log(`Server started on port ${server.address().port} :)`);
