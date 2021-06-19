@@ -115,8 +115,8 @@ router.post('/upload-build-services', async(req,res)=>{
             else if(element.name == "environment"){
                 let env = {};
                 element.value.forEach(v=>{
-                    const key = v.split(':')[0];
-                    const value = v.split(':')[1];
+                    const key = v.split('=')[0];
+                    const value = v.split('=')[1];
                     Object.assign(env, {[key]: value});
                 })
                 Object.assign(params, {[element.name]: env});

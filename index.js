@@ -46,26 +46,29 @@ router.post('/:id/:project/:service/payload', async(req,res)=>{
   const name = req.body.repository.name;
   console.log(link);
   console.log(name);
-
-  let service_db = await db.collection("projects").findOne({"user": id, "name": project, "services.service_name": service});
+  if(req.body.zen)
+    console.log("just set up",req.body.zen);
+  else{
+    let service_db = await db.collection("projects").findOne({"user": id, "name": project, "services.service_name": service});
   
-  let image = service_db.services.find(serv=> serv.service_name == service).image_name
-  console.log(image);
-  wss.clients
-    .forEach(client => {
-      client.send(`${id}:${project}:${service}:${image}:${name}`);   
-    });
+    let image = service_db.services.find(serv=> serv.service_name == service).image_name
+    console.log(image);
+    wss.clients
+      .forEach(client => {
+        client.send(`${id}:${project}:${service}:${image}:${name}`);   
+      });
 
-  exec(`cd ${path} && rm -r ${name} && git clone ${link}`, (error, stdout, stderr) => {
-    if (error) {
-        console.log(`error: ${error.message}`);
-    }
-    if (stderr) {
-        console.log(`stderr: ${stderr}`);
-    }
-    console.log("executed")
-    console.log(`stdout: ${stdout}`);
-  });
+    exec(`cd ${path} && rm -r ${name} && git clone ${link}`, (error, stdout, stderr) => {
+      if (error) {
+          console.log(`error: ${error.message}`);
+      }
+      if (stderr) {
+          console.log(`stderr: ${stderr}`);
+      }
+      console.log("executed")
+      console.log(`stdout: ${stdout}`);
+    });
+  }
   //the client will request new service built
 })
 
