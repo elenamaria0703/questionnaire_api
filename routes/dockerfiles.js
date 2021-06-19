@@ -104,12 +104,13 @@ router.post('/upload-build-services', async(req,res)=>{
     var dir = `./static/${userId}/projects/${project}`;
     
     let data={};
+    let newvolumes = {};
     commands.forEach((service)=>{
         const name = service.name;
         let params = {};
         for(i=0;i<service.commands_array.length;i++){
             const element = service.commands_array[i];
-            if(element.name == "image" || element.name == "restart")
+            if(element.name == "image" || element.name == "restart" || element.name == "platform")
                 Object.assign(params, {[element.name]: element.value[0]});
             else if(element.name == "environment"){
                 let env = {};
@@ -120,6 +121,9 @@ router.post('/upload-build-services', async(req,res)=>{
                 })
                 Object.assign(params, {[element.name]: env});
             }
+            else if (element.name == "newvolumes"){
+                Object.assign(newvolumes, {[element.value[0]]: null});
+            }
             else 
                 Object.assign(params, {[element.name]: element.value});
         }
@@ -128,7 +132,8 @@ router.post('/upload-build-services', async(req,res)=>{
     
     let data_to_send={
         version: '3',
-        services: data
+        services: data,
+        volumes: newvolumes
     }
 
     let yamlStr = yaml.dump(data_to_send);
